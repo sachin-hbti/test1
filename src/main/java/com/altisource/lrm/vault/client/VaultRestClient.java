@@ -40,7 +40,7 @@ public class VaultRestClient {
 	Map<String, String> keyValue = PropertyFileReader.readProperties("rest-client.properties");
 	
 	public File fetchDocument(ViewRequest viewRequest) {
-
+		//Adding the comment to do a git commit
 		File pdfFile = null;
 		try {
 
@@ -75,7 +75,7 @@ public class VaultRestClient {
 		LOGGER.debug("Fetch document response pdf file :{}", pdfFile);
 		return pdfFile;
 	}
-
+	//This method didnot have comment before sometime back, now it has comments
 	private String getErrorMessage(ErrorResponse errorResponse) {
 		String msg = "ErrorCode:" + errorResponse.getErrorCode() + ",ErrorDescription:"
 				+ errorResponse.getErrorDescription() + ", Details: " + errorResponse.getDetail();
