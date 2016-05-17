@@ -139,5 +139,9 @@ public class VaultRestClient {
 		}
 		return errorResponse;
 	}
+	//Added newMethod to test git revert command
+	private String newMethodPre(){
+		return  null;
+	}
 
 }
