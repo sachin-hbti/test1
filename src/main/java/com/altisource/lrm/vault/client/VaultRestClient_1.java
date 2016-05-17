@@ -39,42 +39,7 @@ public class VaultRestClient {
 	
 	Map<String, String> keyValue = PropertyFileReader.readProperties("rest-client.properties");
 	
-	public File fetchDocument(ViewRequest viewRequest) {
-		//Adding the comment to do a git commit
-		File pdfFile = null;
-		try {
-
-			ObjectMapper mapper = new ObjectMapper();
-
-			String requestURI = keyValue.get(PARAM_DOCUMENT_URI);
-			String viewReqJSON = mapper.writeValueAsString(viewRequest);
-			
-			LOGGER.info("Fetch document request URI :{}", requestURI);
-			LOGGER.debug("Fetch document request JSON :{}", viewReqJSON);
-			Response response = sendRequest(viewReqJSON, requestURI);
-
-			// document API will be a multipart response
-			MultiPart multiPart = response.readEntity(MultiPart.class);
-
-			if (ERROR_RESPONSE_TYPE.equals(response.getHeaderString("responseType"))) {
-				ErrorResponse errorResponse = getErrorResponse(multiPart, mapper);
-				String msg = getErrorMessage(errorResponse);
-				LOGGER.error("Fetch document error response :{}", msg);
-				throw new RuntimeException(msg);
-			}
-
-			for (BodyPart eachBodyPart : multiPart.getBodyParts()) {
-				if (eachBodyPart.getMediaType().toString().equals(VaultRestClientConstants.APPLICATION_PDF))
-					pdfFile = eachBodyPart.getEntityAs(File.class);
-			}
-		} catch (Exception e) {
-			LOGGER.error("Error while fetching document :{}", e);
-			throw new RuntimeException("Error while fetching document", e);
-		}
-		
-		LOGGER.debug("Fetch document response pdf file :{}", pdfFile);
-		return pdfFile;
-	}
+	
 	//This method didnot have comment before sometime back, now it has comments
 	private String getErrorMessage(ErrorResponse errorResponse) {
 		String msg = "ErrorCode:" + errorResponse.getErrorCode() + ",ErrorDescription:"
@@ -128,7 +93,43 @@ public class VaultRestClient {
 			throw new RuntimeException("Error while searching documents", e);
 		}
 	}
+	public File fetchDocument(ViewRequest viewRequest) {
+		//Adding the comment to do a git commit
+		File pdfFile = null;
+		try {
 
+			ObjectMapper mapper = new ObjectMapper();
+
+			String requestURI = keyValue.get(PARAM_DOCUMENT_URI);
+			String viewReqJSON = mapper.writeValueAsString(viewRequest);
+			
+			LOGGER.info("Fetch document request URI :{}", requestURI);
+			LOGGER.debug("Fetch document request JSON :{}", viewReqJSON);
+			Response response = sendRequest(viewReqJSON, requestURI);
+
+			// document API will be a multipart response
+			MultiPart multiPart = response.readEntity(MultiPart.class);
+
+			if (ERROR_RESPONSE_TYPE.equals(response.getHeaderString("responseType"))) {
+				ErrorResponse errorResponse = getErrorResponse(multiPart, mapper);
+				String msg = getErrorMessage(errorResponse);
+				LOGGER.error("Fetch document error response :{}", msg);
+				throw new RuntimeException(msg);
+			}
+
+			for (BodyPart eachBodyPart : multiPart.getBodyParts()) {
+				if (eachBodyPart.getMediaType().toString().equals(VaultRestClientConstants.APPLICATION_PDF))
+					pdfFile = eachBodyPart.getEntityAs(File.class);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error while fetching document :{}", e);
+			throw new RuntimeException("Error while fetching document", e);
+		}
+		
+		LOGGER.debug("Fetch document response pdf file :{}", pdfFile);
+		return pdfFile;
+	}
+	
 	private ErrorResponse getErrorResponse(MultiPart multiPart, ObjectMapper mapper) throws Exception {
 		ErrorResponse errorResponse = null;
 		for (BodyPart eachBodyPart : multiPart.getBodyParts()) {
